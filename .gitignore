@@ -2,3 +2,6 @@ klienci.csv
 klienci.json
 *.txt
 __pycache__/
+raw/
+.profil-przegladarki/
+node_modules/

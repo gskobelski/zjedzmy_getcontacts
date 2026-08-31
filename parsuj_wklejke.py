@@ -159,7 +159,11 @@ def parsuj_karte(surowy: str) -> dict[str, str] | None:
         "nowy_klient": "TAK" if nowy else "NIE",
         "rezerwacje_u_mnie": "1" if nowy else dopasuj(w_restauracji, r"Rezerwacje:\s*(\d+)"),
         "rezerwacje_zjedzmy": dopasuj(w_zjedzmy, r"Rezerwacje:\s*(\d+)"),
-        "zwykle_osob": dopasuj(w_restauracji, r"Zazwyczaj przychodzi z\s*(\d+)"),
+        # Panel podaje "Zazwyczaj przychodzi z" osobno dla Twojej restauracji
+        # i dla calego Zjedz.my — na 500 kart 128 mialo to TYLKO w kolumnie
+        # Zjedz.my. Wolimy liczbe z Twojego lokalu, globalna to plan B.
+        "zwykle_osob": (dopasuj(w_restauracji, r"Zazwyczaj przychodzi z\s*(\d+)")
+                        or dopasuj(w_zjedzmy, r"Zazwyczaj przychodzi z\s*(\d+)")),
         "ulubiona_godzina": dopasuj(w_restauracji, r"Ulubiona godzina:\s*(\d+)"),
         "ulubiony_dzien": dopasuj(w_restauracji, r"Ulubiony dzie[nń]:\s*(\w+)"),
         "ostatnia_rezerwacja_data": data_pl(ostatnie),

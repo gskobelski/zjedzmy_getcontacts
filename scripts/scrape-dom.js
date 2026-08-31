@@ -126,7 +126,11 @@
       nowy_klient: nowy ? 'TAK' : 'NIE',
       rezerwacje_u_mnie: rezWRestauracji,
       rezerwacje_zjedzmy: dopasuj(wZjedzmy, /Rezerwacje:\s*(\d+)/),
-      zwykle_osob: dopasuj(wRestauracji, /Zazwyczaj przychodzi z\s*(\d+)/),
+      // Panel podaje "Zazwyczaj przychodzi z" osobno dla Twojej restauracji i dla
+      // calego Zjedz.my, przy czym na 500 kart 128 mialo to TYLKO w kolumnie
+      // Zjedz.my. Wolimy liczbe z Twojego lokalu, globalna to plan B.
+      zwykle_osob: dopasuj(wRestauracji, /Zazwyczaj przychodzi z\s*(\d+)/)
+                   || dopasuj(wZjedzmy, /Zazwyczaj przychodzi z\s*(\d+)/),
       ulubiona_godzina: dopasuj(wRestauracji, /Ulubiona godzina:\s*(\d+)/),
       ulubiony_dzien: dopasuj(wRestauracji, /Ulubiony dzie[nń]:\s*(\p{L}+)/u),
       ostatnia_rezerwacja_data: dataPL(ostatnie),
@@ -292,6 +296,7 @@
 
   window.zmIle = () => ({ konta: magazyn.wiersze.size, osoby: scal().length });
   window.zmParsuj = parsujKarte;                    // przydatne do debugowania jednej karty
+  window.zmDataPL = dataPL;                         // uzywa tego api-scrape.js
   window.zmScal = scal;                             // gotowe wiersze przed zapisem do pliku
   window.zmPodglad = () => console.table(scal().slice(0, 25));
   window.zmReset = () => { magazyn.wiersze.clear(); console.log('[zjedzmy] pamiec wyczyszczona'); };
