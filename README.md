@@ -16,7 +16,7 @@ nadającego się do kampanii mailowych i SMS.
 | `nowy_klient` | TAK = pierwsza rezerwacja u Ciebie |
 | `rezerwacje_u_mnie` | liczba rezerwacji w Twojej restauracji |
 | `rezerwacje_zjedzmy` | liczba rezerwacji w całym Zjedz.my |
-| `zwykle_osob` | zazwyczaj przychodzi z X osób |
+| `zwykle_osob` | zazwyczaj przychodzi z X osób — z Twojego lokalu, a gdy panel go tam nie podaje, z całego Zjedz.my |
 | `ulubiona_godzina`, `ulubiony_dzien` | preferencje |
 | `ostatnia_rezerwacja_data` | `RRRR-MM-DD GG:MM` |
 | `ostatnia_rezerwacja_status` | Zrealizowana / Potwierdzona / … |
@@ -50,45 +50,97 @@ warto rzucić okiem, zanim wyślesz kampanię.
 
 ---
 
-## Cel: 6 965 kontaktów
+## Skąd biorą się dane: API panelu
 
-Panel stoi na **jQuery DataTables** — stopka „Pozycje od 1 do 10 z 6 965
-łącznie", przełącznik „Pokaż X pozycji", strony 1…697. Skrypt przestawia
-listę na 100 pozycji i sam przeklikuje ~70 stron.
+Zakładka „Baza klientów" stoi na **server-side DataTables**, który ma własny
+endpoint JSON:
 
-## Droga główna: konsola przeglądarki
+```
+GET https://zjedz.my/<restauracja>/profile/ajax/datatables/users?draw=1&start=0&length=500
+```
 
-Skrypt działa **Twoją własną, zalogowaną sesją** — nigdzie nie podajesz hasła.
+Odpowiedź niesie `recordsTotal` (u nas **6 965**) i tablicę `data[]` — w niej
+komplet pól klienta plus `added_details`, czyli wyrenderowaną kartę jako HTML.
+Uwierzytelnia zwykłe ciasteczko sesji Laravela, więc **nigdzie nie podajesz
+hasła** — leci Twoja własna, zalogowana sesja.
+
+Zamiast przeklikiwać 697 stron po 10 pozycji bierzemy więc bazę w **14 porcjach
+po 500**. Pełne rozpoznanie — parametry, model uwierzytelnienia, zmierzone czasy
+i pułapki w HTML-u karty — jest w [ROZPOZNANIE.md](ROZPOZNANIE.md).
+
+---
+
+## Droga główna: jedno polecenie w terminalu
+
+```bash
+git clone https://github.com/gskobelski/zjedzmy_getcontacts.git
+cd zjedzmy_getcontacts
+npm install        # playwright + chromium, ~2 min, raz
+npm start
+```
+
+Otworzy się okno przeglądarki na panelu Zjedz.my.
+
+1. **Zaloguj się w tym oknie ręcznie.** Skrypt czeka i ruszy sam, gdy wejdziesz
+   do panelu — hasła nigdzie nie podajesz, skrypt go nie widzi.
+2. Zostaw okno otwarte na ~10 minut. Postęp leci do terminala.
+3. Na końcu obok repo pojawi się `klienci.csv`.
+
+Sesja zostaje w `.profil-przegladarki/`, więc **logujesz się tylko za pierwszym
+razem** — kolejne uruchomienia ruszają od razu.
+
+Potrzebne: **Node 18+** i konto w Zjedz.my z dostępem managerskim do lokalu.
+Inna restauracja niż Tygryz — dopisz jej nazwę z adresu panelu:
+
+```bash
+npm start -- nazwa-restauracji-z-adresu
+```
+
+Przy okazji lądują w `raw/` surowe odpowiedzi API. Nie są do niczego potrzebne,
+ale pozwalają przeliczyć CSV jeszcze raz bez ruszania serwera:
+`python3 parsuj_api.py raw/`.
+
+---
+
+## To samo bez instalowania czegokolwiek: konsola przeglądarki
+
+Gdy na maszynie nie ma Node'a albo nie chcesz nic instalować — te same dwa
+pliki można wkleić ręcznie:
 
 1. Otwórz `https://zjedz.my/tygryz-restauracja-poznan/profile#company-users`
 2. `F12` → zakładka **Console**.
    Chrome przy pierwszym wklejeniu zażąda wpisania `allow pasting` — wpisz i Enter.
 3. Wklej całą zawartość `scripts/scrape-dom.js`, Enter.
-4. Wklej całą zawartość `scripts/auto-scrape.js`, Enter.
-5. **Zostaw kartę otwartą i poczekaj.** Skrypt raportuje postęp po każdej
-   stronie i na końcu sam zapisze `klienci.csv`.
+4. Wklej całą zawartość `scripts/api-scrape.js`, Enter.
+5. **Zostaw kartę otwartą.** Skrypt raportuje postęp po każdej porcji
+   (~45 s każda, razem ~10 min) i na końcu sam zapisze `klienci.csv`.
+
+`scrape-dom.js` wnosi parser karty i scalanie kont, `api-scrape.js` — pobieranie
+z API. To jest dokładnie to, co `npm start` robi za Ciebie: `pobierz-api.js`
+otwiera okno i wstrzykuje te dwa pliki, więc **obie drogi liczą to samo**.
 
 Przerwanie w trakcie: `zmStop()` — zebrane dane zostają, `zmPobierz()` działa.
 
-Jeśli na koniec skrypt ostrzeże, że zebrał mniej niż 6 965 — odpal
-`auto-scrape.js` jeszcze raz. Dozbiera brakujące, duplikaty odpadają same.
+Komendy: `zmIle()` (konta i osoby) · `zmPodglad()` · `zmDuplikaty()` ·
+`zmPobierz()` · `zmPobierzJSON()` · `zmReset()` · `zmScal()` · `zmStop()`
 
-### Wariant ręczny
+---
 
-Sam `scrape-dom.js` bez auto-paginacji: `zmZbierz()` po każdej ręcznie
-przeklikanej stronie, na koniec `zmPobierz()`. Powtórne zebranie tej samej
-strony niczego nie psuje.
+## Droga zapasowa: klikanie po DOM
 
-Komendy: `zmZbierz()` · `zmIle()` (konta i osoby) · `zmPodglad()` ·
-`zmDuplikaty()` · `zmPobierz()` · `zmPobierzJSON()` · `zmReset()` ·
-`zmScal()` · `zmParsuj(tekst)` · `zmStop()`
+Gdyby endpoint kiedyś zniknął albo zmienił format — zostaje stary sposób,
+czyli czytanie kart wyrenderowanych na stronie:
 
-### Jeśli liczba kart się nie zgadza
+1. `scripts/scrape-dom.js` — parser + `zmZbierz()` dla bieżącej strony
+2. `scripts/auto-scrape.js` — przestawia listę na 100 pozycji i sam przeklikuje
+   ~70 stron
 
-Strona mogła zmienić układ HTML. Odpal wtedy `scripts/probe-api.js` (instrukcja
-w nagłówku pliku) — podsłuchuje zapytania sieciowe i pokazuje, czy istnieje
-endpoint API zwracający listę klientów w JSON. Z takim adresem da się pobrać
-wszystko jednym zapytaniem, bez scrapowania HTML.
+Sam `scrape-dom.js` wystarczy do wariantu ręcznego: `zmZbierz()` po każdej
+przeklikanej stronie, na koniec `zmPobierz()`. Powtórne zebranie tej samej strony
+niczego nie psuje.
+
+`scripts/probe-api.js` podsłuchuje ruch sieciowy strony i wypisuje zapytania
+wyglądające na API — przydatne, gdyby trzeba było namierzyć nowy endpoint.
 
 ---
 
@@ -115,6 +167,8 @@ Skrypt sam znajduje granice między klientami po adresach e-mail i nie wymaga
   Przekierowują na prawdziwą skrzynkę, ale użytkownik może je wyłączyć
   jednym kliknięciem, a część systemów mailingowych je odrzuca. Przy takich
   kontaktach telefon jest pewniejszym kanałem.
+- **Konta skasowane** (RODO) panel oddaje jako „Użytkownik usunięty" z zaślepkami
+  zamiast maila i telefonu. Oba skrypty je wyrzucają — na 6 965 kontach było ich 11.
 - Sprawdź w regulaminie Zjedz.my, na jakich zasadach udostępniają Ci te dane —
   eksport bazy bywa tam osobno uregulowany.
 

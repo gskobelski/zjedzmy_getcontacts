@@ -1,0 +1,16 @@
+{
+  "name": "zjedzmy-getcontacts",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Eksport bazy klientow z panelu Zjedz.my do CSV",
+  "scripts": {
+    "postinstall": "playwright install chromium",
+    "start": "node scripts/pobierz-api.js"
+  },
+  "dependencies": {
+    "playwright": "^1.62.1"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
