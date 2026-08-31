@@ -1,0 +1,4 @@
+klienci.csv
+klienci.json
+*.txt
+__pycache__/
