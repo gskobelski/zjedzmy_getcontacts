@@ -2,7 +2,8 @@
 
 Instrukcja dla kogoś, kto nie pracuje na co dzień w terminalu.
 Napisana pod Maca — pod Windowsem różni się tylko sposób otwierania okna
-poleceń (jest o tym na końcu).
+poleceń (jest o tym na końcu). Kto ma gita i czuje się w terminalu
+swobodnie, znajdzie skrót zaraz pod tym akapitem.
 
 Efekt: plik **`klienci.csv`** z całą bazą klientów, gotowy do otwarcia
 w Excelu. Cała rzecz zajmuje ok. 15 minut, z czego Twojej uwagi wymaga
@@ -11,6 +12,29 @@ pierwsza — reszta dzieje się sama.
 **Czego potrzebujesz:** własnego konta w Zjedz.my z dostępem managerskim
 do lokalu. Logujesz się nim sam, w okienku przeglądarki — nikt nie
 przekazuje Ci hasła i nigdzie go nie wpisujesz w terminalu.
+
+---
+
+## Skrót dla kogoś, kto ma gita i terminal
+
+Trzy linijki i tyle:
+
+```bash
+git clone https://github.com/gskobelski/zjedzmy_getcontacts.git
+cd zjedzmy_getcontacts
+npm install && npm start
+```
+
+Otworzy się okno przeglądarki — zaloguj się w nim ręcznie, dalej program
+radzi sobie sam przez ok. 10 minut. Efekt: `klienci.csv` w folderze repo.
+Brakuje Node.js 18+? `bash start.command --sprawdz` powie, czego brakuje.
+
+Klonowanie ma nad pobraniem ZIP-a tę przewagę, że poprawki dociągniesz
+przez `git pull` zamiast pobierać wszystko od nowa.
+
+Reszta tej instrukcji jest dla kogoś, kto nie pracuje w terminalu — jeśli
+powyższe zadziałało, możesz ją pominąć i przeskoczyć od razu do
+[sekcji o zgodach](#zanim-ktokolwiek-wyśle-kampanię).
 
 ---
 
