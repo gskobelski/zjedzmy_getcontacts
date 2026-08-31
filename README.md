@@ -92,26 +92,29 @@ bash start.command --sprawdz    # tylko sprawdza wymagania, nic nie uruchamia
 bash start.command              # sprawdza, doinstalowuje i eksportuje
 ```
 
-Otworzy się okno przeglądarki na panelu Zjedz.my.
+Otworzy się okno przeglądarki na Zjedz.my.
 
-1. **Zaloguj się w tym oknie ręcznie.** Skrypt czeka i ruszy sam, gdy wejdziesz
-   do panelu — hasła nigdzie nie podajesz, skrypt go nie widzi.
-2. Zostaw okno otwarte na ~10 minut. Postęp leci do terminala.
-3. Na końcu obok repo pojawi się `klienci.csv`.
+1. **Zaloguj się w tym oknie ręcznie.** Skrypt czeka i ruszy sam — hasła nigdzie
+   nie podajesz, skrypt go nie widzi.
+2. Skrypt sam sprawdza, **do których restauracji ma dostęp zalogowane konto**.
+   Przy jednej rusza od razu; przy kilku pyta, którą eksportować (albo robi
+   wszystkie po kolei). Nic nie jest wpisane na sztywno.
+3. Zostaw okno otwarte na ~10 minut. Postęp leci do terminala.
+4. Na końcu obok repo pojawi się `klienci-<restauracja>.csv`.
 
 Sesja zostaje w `.profil-przegladarki/`, więc **logujesz się tylko za pierwszym
 razem** — kolejne uruchomienia ruszają od razu.
 
 Potrzebne: **Node 18+** i konto w Zjedz.my z dostępem managerskim do lokalu.
-Inna restauracja niż Tygryz — dopisz jej nazwę z adresu panelu:
+Konkretną restaurację można też wskazać z góry, jej nazwą z adresu panelu:
 
 ```bash
 npm start -- nazwa-restauracji-z-adresu
 ```
 
-Przy okazji lądują w `raw/` surowe odpowiedzi API. Nie są do niczego potrzebne,
-ale pozwalają przeliczyć CSV jeszcze raz bez ruszania serwera:
-`python3 parsuj_api.py raw/`.
+Przy okazji lądują w `raw/<restauracja>/` surowe odpowiedzi API. Nie są do
+niczego potrzebne, ale pozwalają przeliczyć CSV jeszcze raz bez ruszania
+serwera: `python3 parsuj_api.py raw/<restauracja>`.
 
 ---
 
@@ -120,13 +123,14 @@ ale pozwalają przeliczyć CSV jeszcze raz bez ruszania serwera:
 Gdy na maszynie nie ma Node'a albo nie chcesz nic instalować — te same dwa
 pliki można wkleić ręcznie:
 
-1. Otwórz `https://zjedz.my/tygryz-restauracja-poznan/profile#company-users`
+1. Otwórz panel **swojej** restauracji: `https://zjedz.my/<restauracja>/profile#company-users`
 2. `F12` → zakładka **Console**.
    Chrome przy pierwszym wklejeniu zażąda wpisania `allow pasting` — wpisz i Enter.
 3. Wklej całą zawartość `scripts/scrape-dom.js`, Enter.
 4. Wklej całą zawartość `scripts/api-scrape.js`, Enter.
 5. **Zostaw kartę otwartą.** Skrypt raportuje postęp po każdej porcji
    (~45 s każda, razem ~10 min) i na końcu sam zapisze `klienci.csv`.
+   Restaurację bierze z adresu otwartej strony, więc działa w każdym panelu.
 
 `scrape-dom.js` wnosi parser karty i scalanie kont, `api-scrape.js` — pobieranie
 z API. To jest dokładnie to, co `npm start` robi za Ciebie: `pobierz-api.js`

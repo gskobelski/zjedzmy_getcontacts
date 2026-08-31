@@ -5,8 +5,8 @@ Napisana pod Maca — pod Windowsem różni się tylko sposób otwierania okna
 poleceń (jest o tym na końcu). Kto ma gita i czuje się w terminalu
 swobodnie, znajdzie skrót zaraz pod tym akapitem.
 
-Efekt: plik **`klienci.csv`** z całą bazą klientów, gotowy do otwarcia
-w Excelu. Cała rzecz zajmuje ok. 15 minut, z czego Twojej uwagi wymaga
+Efekt: plik **`klienci-<twoja-restauracja>.csv`** z całą bazą klientów,
+gotowy do otwarcia w Excelu. Cała rzecz zajmuje ok. 15 minut, z czego Twojej uwagi wymaga
 pierwsza — reszta dzieje się sama.
 
 **Czego potrzebujesz:** własnego konta w Zjedz.my z dostępem managerskim
@@ -26,7 +26,9 @@ npm install && npm start
 ```
 
 Otworzy się okno przeglądarki — zaloguj się w nim ręcznie, dalej program
-radzi sobie sam przez ok. 10 minut. Efekt: `klienci.csv` w folderze repo.
+radzi sobie sam przez ok. 10 minut. Sam wykryje, do której restauracji masz
+dostęp — nic nie jest wpisane na sztywno. Efekt: `klienci-<restauracja>.csv`
+w folderze repo.
 Brakuje Node.js 18+? `bash start.command --sprawdz` powie, czego brakuje.
 
 Klonowanie ma nad pobraniem ZIP-a tę przewagę, że poprawki dociągniesz
@@ -113,8 +115,12 @@ To wszystko. Program sam doinstaluje resztę (za pierwszym razem ok. 2 minuty
 i sporo tekstu na ekranie — tak ma być), a potem otworzy okno przeglądarki.
 
 **Zaloguj się w tym oknie ręcznie**, tak jak zawsze wchodzisz do panelu
-Zjedz.my. Program czeka i ruszy sam, gdy tylko znajdziesz się w środku.
-Za drugim razem logowanie już Cię nie zapyta.
+Zjedz.my — na **swoje** konto. Program czeka i ruszy sam, gdy tylko znajdziesz
+się w środku. Za drugim razem logowanie już Cię nie zapyta.
+
+Potem sam sprawdzi, do których restauracji ma dostęp Twoje konto. Przy jednej
+rusza od razu. Przy kilku pokaże listę i zapyta, którą eksportować — wpisujesz
+sam numer z listy i Enter. Można też wybrać „wszystkie po kolei".
 
 Dalej zostaw wszystko w spokoju na **ok. 10 minut**. Nie zamykaj ani okna
 przeglądarki, ani okna Terminala. W Terminalu będą pojawiać się linie postępu:
@@ -128,8 +134,8 @@ przeglądarki, ani okna Terminala. W Terminalu będą pojawiać się linie post�
 > czasem urywa jedno zapytanie; program powtarza je do trzech razy i idzie
 > dalej. Reaguj dopiero, gdy napisze wprost, że się poddaje.
 
-Na koniec w folderze programu pojawi się **`klienci.csv`** — jeden wiersz
-na osobę, ok. 6 800 wierszy. Otwiera się dwuklikiem w Excelu, polskie znaki
+Na koniec w folderze programu pojawi się **`klienci-<restauracja>.csv`** —
+jeden wiersz na osobę. Otwiera się dwuklikiem w Excelu, polskie znaki
 i kolumny wchodzą same.
 
 ### Można też bez Terminala
@@ -149,6 +155,7 @@ w okienku. Kolejne razy działają zwykłym dwuklikiem.
 | `No such file or directory` po `bash start.command` | Terminal nie stoi w folderze programu. Powtórz punkt 2 z kroku 1: `cd ` + przeciągnięcie folderu |
 | `Repository not found` przy pobieraniu | Nie masz jeszcze dostępu do repozytorium albo nie przyjąłeś zaproszenia — sprawdź maila z GitHuba |
 | Okno przeglądarki zamknęło się w trakcie | Uruchom `bash start.command` jeszcze raz. Pobieranie zacznie się od początku, ale logować się już nie musisz |
+| `403` albo „nie mam dostępu do bazy klientów" | Zalogowane konto nie zarządza tym lokalem. Zaloguj się na konto z dostępem managerskim albo poproś właściciela o dodanie Cię w panelu, w sekcji „Pracownicy" |
 | „brakuje N kont" na końcu | Uruchom jeszcze raz. Osobna informacja o **pominiętych kontach skasowanych** to co innego — tak ma być |
 | Instalacja przerywa się z błędem sieci | Sprawdź internet i spróbuj ponownie |
 

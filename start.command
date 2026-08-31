@@ -117,6 +117,8 @@ echo "Za chwile otworzy sie okno przegladarki."
 echo
 echo "  * Jesli poprosi o logowanie — zaloguj sie w nim RECZNIE,"
 echo "    tak jak zawsze. Program czeka i ruszy sam."
+echo "  * Sam wykryje, do ktorej restauracji masz dostep. Jesli masz"
+echo "    kilka lokali — zapyta, ktory eksportowac."
 echo "  * Potem zostaw wszystko w spokoju na ok. 10 minut."
 echo "  * Nie zamykaj ani okna przegladarki, ani tego okna."
 echo "----------------------------------------"
@@ -124,7 +126,7 @@ echo
 
 if npm start; then
   echo
-  zielony "Gotowe. Plik klienci.csv lezy w tym samym folderze co ten skrypt."
+  zielony "Gotowe. Plik klienci-<restauracja>.csv lezy w tym samym folderze co ten skrypt."
   echo "Otworzysz go dwuklikiem w Excelu."
   echo
   zolty "Zanim ktokolwiek wysle kampanie: w pliku jest kolumna zgoda_marketing."

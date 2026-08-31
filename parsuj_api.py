@@ -3,9 +3,9 @@
 
 Panel "Baza klientow" stoi na server-side jQuery DataTables i ma wlasny
 endpoint JSON (opis w README, sekcja "Droga najkrotsza"). scripts/pobierz-api.js
-zapisuje jego odpowiedzi do katalogu raw/ — ten skrypt je czyta:
+zapisuje jego odpowiedzi do katalogu raw/<restauracja>/ — ten skrypt je czyta:
 
-    python3 parsuj_api.py raw/
+    python3 parsuj_api.py raw/nazwa-restauracji
 
 Wiekszosc pol jest w JSON-ie wprost. Reszta (rezerwacje w calym Zjedz.my,
 preferencje, ostatnia rezerwacja) siedzi w polu `added_details`, ktore serwer
