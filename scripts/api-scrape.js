@@ -33,6 +33,7 @@
   }
   if (window.__zmAuto) { console.warn('[api] cos juz chodzi — zmStop() zeby przerwac'); return; }
   window.__zmAuto = { stop: false };
+  window.__zmBlad = null;        // ustawiamy, gdy trzeba przerwac — czyta to pobierz-api.js
   window.zmStop = () => { window.__zmAuto.stop = true; console.warn('[api] zatrzymuje po biezacej porcji'); };
 
   // scrape-dom.js przy wklejeniu zbiera karty widoczne na ekranie i kluczuje je
@@ -109,9 +110,22 @@
 
   /* --- petla po porcjach ------------------------------------------ */
 
+  // 401/403 to odmowa dostepu, a nie usterka polaczenia — ponawianie niczego
+  // nie zmieni, wiec przerywamy od razu i mowimy, o co chodzi.
+  class BrakDostepu extends Error {}
+
   const pobierzPorcje = async (start) => {
     const res = await fetch(`${ENDPOINT}?draw=1&start=${start}&length=${PORCJA}&${SORT}`,
       { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'include' });
+    if (res.status === 401 || res.status === 403) {
+      // Bez wciec — komunikat wypisuje i przegladarka, i terminal, kazde po swojemu.
+      throw new BrakDostepu(
+        `Zjedz.my odmowilo dostepu (HTTP ${res.status}).\n` +
+        'Konto, na ktore sie zalogowales, nie ma dostepu do bazy klientow tej restauracji.\n' +
+        'Wlasciciel lokalu musi dodac Cie w panelu, w sekcji "Pracownicy".\n' +
+        `Jesli chodzi o INNA restauracje — podaj jej nazwe z adresu panelu, np.\n` +
+        `npm start -- nazwa-restauracji   (teraz probowalem: ${restauracja})`);
+    }
     if (!res.ok) throw new Error('HTTP ' + res.status);
     return res.json();
   };
@@ -126,6 +140,7 @@
       for (let proba = 1; proba <= 3 && !j; proba++) {
         try { j = await pobierzPorcje(start); }
         catch (e) {
+          if (e instanceof BrakDostepu) throw e;
           console.warn(`[api] porcja ${start}, proba ${proba} nieudana: ${e.message}`);
           await pauza(5000 * proba);
         }
@@ -145,8 +160,11 @@
       await pauza(PAUZA_MS);
     }
   } catch (e) {
-    console.error('[api] przerwane:', e.message,
-                  '— zebrane dane zostaja, zmPobierz() dziala, ponowne uruchomienie dozbiera reszte');
+    window.__zmBlad = e.message;
+    console.error('[api] przerwane:', e.message);
+    if (magazyn.size) {
+      console.error('[api] zebrane dane zostaja — zmPobierz() dziala, ponowne uruchomienie dozbiera reszte');
+    }
   } finally {
     kontener.remove();
     window.__zmAuto = null;
@@ -161,5 +179,7 @@
   if (braki > 0) {
     console.warn(`[api] brakuje ${braki} kont — odpal ten plik jeszcze raz`);
   }
-  window.zmPobierz();
+  // Pusty plik tylko wprowadzalby w blad — lepiej zeby nie powstal wcale.
+  if (magazyn.size) window.zmPobierz();
+  else console.error('[api] nie zebrano ani jednego konta — plik nie powstal');
 })();

@@ -1,5 +1,5 @@
-klienci.csv
-klienci.json
+klienci*.csv
+klienci*.json
 *.txt
 __pycache__/
 raw/
