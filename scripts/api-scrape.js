@@ -90,7 +90,7 @@
 
   function naWiersz(r) {
     kontener.innerHTML = r.added_details || '';
-    const wiersz = window.zmParsuj(kontener.innerText || '') || {};
+    const wiersz = window.zmParsuj(kontener.innerText || '', { wymagajMaila: false }) || {};
     const nick = [r.first_name, r.last_name].filter(Boolean).join(' ').trim();
 
     // Pola, ktore API podaje wprost, bija to co wyskrobane z HTML-a.
@@ -155,8 +155,11 @@
   console.log(`%c[api] koniec: ${magazyn.size} kont${total ? ' z ' + total : ''}`
               + (usuniete ? ` (pominieto ${usuniete} kont skasowanych)` : ''),
               'color:#fc0;font-weight:bold');
-  if (total && magazyn.size < total) {
-    console.warn(`[api] brakuje ${total - magazyn.size} kont — odpal ten plik jeszcze raz`);
+  // Konta skasowane odrzucamy swiadomie, wiec nie sa "brakiem" — inaczej skrypt
+  // strzelalby alarmem po kazdym udanym przebiegu.
+  const braki = total ? total - magazyn.size - usuniete : 0;
+  if (braki > 0) {
+    console.warn(`[api] brakuje ${braki} kont — odpal ten plik jeszcze raz`);
   }
   window.zmPobierz();
 })();

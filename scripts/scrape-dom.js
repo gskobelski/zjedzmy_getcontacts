@@ -91,10 +91,16 @@
 
   /* --- parsowanie jednej karty ------------------------------------ */
 
-  function parsujKarte(surowyTekst) {
+  /* Adres e-mail sluzy tu za dowod, ze dostalismy karte klienta, a nie
+   * przypadkowy kawalek strony — znajdzKarty() szuka ich heurystycznie po DOM.
+   * Gdy karta przychodzi z API (api-scrape.js), zrodlo jest pewne, a adres bywa
+   * niepoprawny: w bazie sa konta z mailem "x@x" czy "snita.julia@gmail", bez
+   * koncowki domeny. Takie karty odpadaly wtedy w calosci. Stad wymagajMaila. */
+  function parsujKarte(surowyTekst, opcje) {
+    const wymagajMaila = !opcje || opcje.wymagajMaila !== false;
     const tekst = czysty(surowyTekst.replace(/ /g, ' '));
     const email = (tekst.match(EMAIL) || [''])[0];
-    if (!email) return null;
+    if (!email && wymagajMaila) return null;
 
     // Strona dzieli statystyki na dwie kolumny — rozdzielamy je,
     // bo obie uzywaja tych samych etykiet ("Ulubiona godzina" itd.).
