@@ -3,6 +3,10 @@
 Wyciąganie bazy klientów z panelu Zjedz.my (`/profile#company-users`) do CSV
 nadającego się do kampanii mailowych i SMS.
 
+> **Masz to tylko uruchomić, a nie grzebać w środku?**
+> [INSTRUKCJA.md](INSTRUKCJA.md) — krok po kroku, bez zakładania,
+> że siedzisz w terminalu na co dzień.
+
 ## Co wyciągamy
 
 | kolumna | opis |
@@ -77,6 +81,15 @@ git clone https://github.com/gskobelski/zjedzmy_getcontacts.git
 cd zjedzmy_getcontacts
 npm install        # playwright + chromium, ~2 min, raz
 npm start
+```
+
+Albo, gdy komputer jest cudzy i nie wiadomo, co na nim stoi —
+`start.command` robi to samo, tyle że sam sprawdza, czego brakuje,
+i tłumaczy każdy błąd po ludzku. Na Macu wystarczy go kliknąć dwukrotnie.
+
+```bash
+bash start.command --sprawdz    # tylko sprawdza wymagania, nic nie uruchamia
+bash start.command              # sprawdza, doinstalowuje i eksportuje
 ```
 
 Otworzy się okno przeglądarki na panelu Zjedz.my.
